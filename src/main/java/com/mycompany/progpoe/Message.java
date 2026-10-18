@@ -6,19 +6,20 @@ package com.mycompany.progpoe;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  *
  * @author Student
  */
 public class Message {
-    public String messageID;
-    public int messageNum;
-    public String recipient;
-    public String message;
-    public static int totalSentMessages = 0;
-    
-    
+
+    private String messageID;
+    private int messageNum;
+    private String recipient;
+    private String message;
+    private static int totalSentMessages = 0;
+
     public Message(int messageNum, String recipient, String message) {
         this.messageNum = messageNum;
         this.recipient = recipient;
@@ -26,34 +27,41 @@ public class Message {
         this.messageID = generateRandomMessageID();
     }
 
-public String generateRandomMessageID() {
-        Random rand = new Random();
-        long id = 1000000000L + (long)(rand.nextDouble() * 9000000000L);
-        return String.valueOf(id);
+    //string manipulation (substring) 
+    private String generateRandomMessageID() {
+        String uuid = UUID.randomUUID().toString().replaceAll("[^0-9]", "");
+        if (uuid.length() < 10) {
+            uuid = uuid + "1234567890";
+        }
+        return uuid.substring(0, 10);
     }
- public String getMessageID() {
+
+    public String getMessageID() {
         return messageID;
     }
 
- public boolean checkMessageID() {
+    public boolean checkMessageID() {
         return this.messageID != null && this.messageID.length() <= 10;
     }
-public String checkRecipientCell() {
+
+    public String checkRecipientCell() {
         if (this.recipient != null && this.recipient.matches("^\\+27[0-9]{9}$")) {
             return "Cell phone number successfully captured.";
         } else {
             return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
         }
     }
- public String validateMessageLength() {
+
+    public String validateMessageLength() {
         if (this.message.length() <= 250) {
             return "Message ready to send.";
         } else {
             int excess = this.message.length() - 250;
-            return "Message exceeds 250 characters by " + excess+" characters, " + " please reduce the size.";
+            return "Message exceeds 250 characters by " + excess + " please reduce the size.";
         }
     }
- public String createMessageHash() {
+
+    public String createMessageHash() {
         if (this.message == null || this.message.trim().isEmpty() || this.messageID == null) {
             return "";
         }
@@ -66,7 +74,8 @@ public String checkRecipientCell() {
         String rawHash = idPrefix + ":" + this.messageNum + ":" + firstWord + lastWord;
         return rawHash.toUpperCase();
     }
-public String SentMessage(int choice) {
+
+    public String SentMessage(int choice) {
         switch (choice) {
             case 1:
                 totalSentMessages++;
@@ -75,12 +84,18 @@ public String SentMessage(int choice) {
                 return "Press 0 to delete the message.";
             case 3:
                 storeMessage();
-                return "Message successfully stored";
+                return "Message successfully stored.";
             default:
                 return "Invalid selection.";
         }
     }
- public void storeMessage() {
+
+    /**
+     * Stores message details in JSON format.
+     * Reference / Attribution: Standard Java File I/O JSON formatting implementation
+     * Reference: https://docs.oracle.com/javase/8/docs/api/java/io/FileWriter.html
+     */
+    public void storeMessage() {
         String filename = "messages.json";
         String jsonEntry = String.format(
             "{\n  \"messageID\": \"%s\",\n  \"messageNum\": %d,\n  \"recipient\": \"%s\",\n  \"message\": \"%s\",\n  \"messageHash\": \"%s\"\n}",
@@ -88,12 +103,13 @@ public String SentMessage(int choice) {
         );
 
         try (FileWriter writer = new FileWriter(filename, true)) {
-            writer.write(jsonEntry + "\n");
+            writer.write(jsonEntry + ",\n");
         } catch (IOException e) {
             System.out.println("Error saving JSON file: " + e.getMessage());
         }
     }
-  public String printMessages() {
+
+    public String printMessages() {
         return "Message ID: " + messageID + "\n"
              + "Message Hash: " + createMessageHash() + "\n"
              + "Recipient: " + recipient + "\n"
@@ -104,6 +120,3 @@ public String SentMessage(int choice) {
         return totalSentMessages;
     }
 }
-
-
-

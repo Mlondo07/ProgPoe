@@ -34,18 +34,13 @@ public class ProgPoe {
         System.out.println("please enter your cellphone number.ensure that you use the correct code");
         String cellphone = Input.nextLine();
 
-        // Pass parameters in matching order
         Poelogin obj = new Poelogin(name, surname, username, password, cellphone);
 
-        // Execute registration check and print status message
         String registrationMessage = obj.registerUser();
         System.out.println(registrationMessage);
 
-        // Track login state to control access to Part 2 QuickChat
         boolean isLoggedIn = false;
 
-        // --- Login ---
-        // Only attempt login if registration actually succeeded
         if (registrationMessage.contains("registered successfully") || registrationMessage.contains("successfully captured") || registrationMessage.contains("successfully added")) {
             System.out.println();
             System.out.println("=== User Login ===");
@@ -56,21 +51,19 @@ public class ProgPoe {
             System.out.print("Enter your password: ");
             String loginPassword = Input.nextLine();
 
-            // Call returnLoginStatus using 'obj' and pass typed login credentials
             String loginStatusMessage = obj.returnLoginStatus(loginUsername, loginPassword);
             System.out.println(loginStatusMessage);
 
-            // Verify authentication
             isLoggedIn = obj.loginUser(loginUsername, loginPassword);
         } else {
             System.out.println("Registration failed. Exiting application.");
         }
 
-        // --- Part 2: QuickChat Messaging Feature ---
         if (isLoggedIn) {
             System.out.println("\nWelcome to QuickChat.");
             boolean running = true;
 
+            // Application while loop
             while (running) {
                 System.out.println("\n--- Main Menu ---");
                 System.out.println("1) Send Messages");
@@ -79,14 +72,15 @@ public class ProgPoe {
                 System.out.print("Choose an option: ");
 
                 int option = Input.nextInt();
-                Input.nextLine(); // Clear buffer
+                Input.nextLine();
 
                 switch (option) {
                     case 1:
                         System.out.print("\nHow many messages would you like to send? ");
                         int totalToProcess = Input.nextInt();
-                        Input.nextLine(); // Clear buffer
+                        Input.nextLine();
 
+                        // For loop using loop counter i for auto-incrementing message number
                         for (int i = 0; i < totalToProcess; i++) {
                             System.out.println("\n--- Message " + (i + 1) + " ---");
 
@@ -98,19 +92,17 @@ public class ProgPoe {
 
                             Message msg = new Message(i, recipient, msgContent);
 
-                            // Validate recipient cellphone format
                             String cellCheck = msg.checkRecipientCell();
                             if (cellCheck.contains("incorrectly")) {
                                 System.out.println(cellCheck);
-                                i--; // Re-prompt current message loop iteration
+                                i--;
                                 continue;
                             }
 
-                            // Validate message character limit
                             String lenCheck = msg.validateMessageLength();
                             if (lenCheck.contains("exceeds")) {
                                 System.out.println(lenCheck);
-                                i--; // Re-prompt current message loop iteration
+                                i--;
                                 continue;
                             }
 
@@ -123,7 +115,7 @@ public class ProgPoe {
                             System.out.println("3) Store Message to send later");
                             System.out.print("Selection: ");
                             int actionChoice = Input.nextInt();
-                            Input.nextLine(); // Clear buffer
+                            Input.nextLine();
 
                             String actionStatus = msg.SentMessage(actionChoice);
                             System.out.println(actionStatus);
