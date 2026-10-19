@@ -12,7 +12,7 @@ import java.util.Scanner;
  */
 public class ProgPoe {
 
-    public static final int MAX_LOGIN_ATTEMPTS = 3;
+    private static final int MAX_LOGIN_ATTEMPTS = 3;
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -20,31 +20,44 @@ public class ProgPoe {
         System.out.println("=== User Registration ===");
 
         System.out.println("Please enter your name:");
-        String name = input.nextLine();
+        String name = input.nextLine().trim();
 
         System.out.println("Please enter your surname:");
-        String surname = input.nextLine();
+        String surname = input.nextLine().trim();
 
-        System.out.println("Please enter your username (it must include an underscore):");
-        String username = input.nextLine();
+        // Each detail is asked again until it is valid, so one typo does not end the program
+        String username;
+        do {
+            System.out.println("Please enter your username (it must include an underscore and be "
+                    + "no more than five characters):");
+            username = input.nextLine().trim();
+            if (!Poelogin.isUsernameValid(username)) {
+                System.out.println(Poelogin.USERNAME_BAD);
+            }
+        } while (!Poelogin.isUsernameValid(username));
 
-        System.out.println("Please enter your password (at least 8 characters, a capital letter, "
-                + "a number and a special character):");
-        String password = input.nextLine();
+        String password;
+        do {
+            System.out.println("Please enter your password (at least 8 characters, a capital letter, "
+                    + "a number and a special character):");
+            password = input.nextLine().trim();
+            if (!Poelogin.isPasswordValid(password)) {
+                System.out.println(Poelogin.PASSWORD_BAD);
+            }
+        } while (!Poelogin.isPasswordValid(password));
 
-        System.out.println("Please enter your cellphone number (with the international code, e.g. +27...):");
-        String cellphone = input.nextLine();
+        String cellphone;
+        do {
+            System.out.println("Please enter your cell phone number with the international code "
+                    + "(e.g. +27831234567):");
+            cellphone = input.nextLine().trim().replace(" ", "");
+            if (!Poelogin.isCellPhoneValid(cellphone)) {
+                System.out.println(Poelogin.CELL_BAD);
+            }
+        } while (!Poelogin.isCellPhoneValid(cellphone));
 
         Poelogin user = new Poelogin(name, surname, username, password, cellphone);
-
-        String registrationMessage = user.registerUser();
-        System.out.println(registrationMessage);
-
-        if (!registrationMessage.contains("registered successfully")) {
-            System.out.println("Registration failed. Exiting application.");
-            input.close();
-            return;
-        }
+        System.out.println(user.registerUser());
 
         // Login (the user only gets into QuickChat if login is successful)
         System.out.println();
@@ -52,9 +65,9 @@ public class ProgPoe {
         boolean isLoggedIn = false;
         for (int attempt = 1; attempt <= MAX_LOGIN_ATTEMPTS && !isLoggedIn; attempt++) {
             System.out.print("Enter your username: ");
-            String loginUsername = input.nextLine();
+            String loginUsername = input.nextLine().trim();
             System.out.print("Enter your password: ");
-            String loginPassword = input.nextLine();
+            String loginPassword = input.nextLine().trim();
 
             System.out.println(user.returnLoginStatus(loginUsername, loginPassword));
             isLoggedIn = user.loginUser(loginUsername, loginPassword);

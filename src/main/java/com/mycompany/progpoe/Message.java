@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- *
- * 
+ * Represents a single QuickChat message and contains the logic used to
+ * validate, hash, send, store and display it.
  *
  * @author Student
  */
@@ -81,14 +81,13 @@ public class Message {
     public String messageIDStatement() {
         return "Message ID generated: " + messageID;
     }
-    
 
     /**
      * True when the recipient number has an international code (+27)
      * followed by nine digits (12 characters in total).
      */
     public boolean isRecipientValid() {
-        return recipient != null && recipient.matches("^\\+27[0-9]{9}$");
+        return recipient != null && recipient.matches("^\\+27[0-9]{9,10}$");
     }
 
     /**
