@@ -12,7 +12,7 @@ import java.util.Scanner;
  */
 public class ProgPoe {
 
-    private static final int MAX_LOGIN_ATTEMPTS = 3;
+    public static final int MAX_LOGIN_ATTEMPTS = 3;
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);

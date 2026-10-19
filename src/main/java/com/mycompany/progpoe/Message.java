@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Represents a single QuickChat message and contains the logic used to
- * validate, hash, send, store and display it.
+ *
+ * 
  *
  * @author Student
  */
