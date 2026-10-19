@@ -81,6 +81,7 @@ public class Message {
     public String messageIDStatement() {
         return "Message ID generated: " + messageID;
     }
+    
 
     /**
      * True when the recipient number has an international code (+27)

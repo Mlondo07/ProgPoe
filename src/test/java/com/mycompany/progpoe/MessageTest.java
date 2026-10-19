@@ -19,16 +19,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class MessageTest {
 
-    private static final String FIXED_ID = "0012345678";
-    private static final String MSG_1 = "Hi Mike, can you join us for dinner tonight?";
-    private static final String MSG_2 = "Hi Keegan, did you receive the payment?";
+    public static final String FIXED_ID = "0012345678";
+    public static final String MSG_1 = "Hi Mike, can you join us for dinner tonight?";
+    public static final String MSG_2 = "Hi Keegan, did you receive the payment?";
 
     // Test data 1 and 2 from the assignment (fixed ID so the hash can be asserted)
-    private Message message1() {
+    public Message message1() {
         return new Message(FIXED_ID, 0, "+27718693002", MSG_1);
     }
 
-    private Message message2() {
+    public Message message2() {
         return new Message(FIXED_ID, 1, "08575975889", MSG_2);
     }
 
