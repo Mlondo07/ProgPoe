@@ -31,11 +31,11 @@ public class Poelogin {
     // International code +27 followed by a number of no more than ten digits
     private static final Pattern CELL = Pattern.compile("^\\+27[0-9]{9,10}$");
 
-    private final String name;
-    private final String surname;
-    private final String username;
-    private final String password;
-    private final String cellphone;
+    public final String name;
+    public final String surname;
+    public final String username;
+    public final String password;
+    public final String cellphone;
 
     public Poelogin(String name, String surname, String username, String password, String cellphone) {
         this.name = name;
