@@ -680,3 +680,5 @@ public class Message {
         return sb.toString();
     }
 }
+
+// the test for part 3 are in (added) the message test java
