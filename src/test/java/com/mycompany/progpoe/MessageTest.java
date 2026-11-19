@@ -8,10 +8,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * 
  *
@@ -162,4 +163,199 @@ public class MessageTest {
         assertEquals(2, json.split("\"messageID\"", -1).length - 1);
         Files.deleteIfExists(file);
     }
+    
+    /**
+ * Part 3 unit tests: arrays, searching, deleting, reports and reading the JSON file.
+ * Uses the five test messages from the assignment.
+ *
+ * @author Student
+ */
+public class StoredMessagesTest {
+
+    private static final int SEND = 1;
+    private static final int DISREGARD = 2;
+    private static final int STORE = 3;
+
+    private static final String MSG_1 = "Did you get the cake?";
+    private static final String MSG_2 = "Where are you? You are late! I have asked you to be on time.";
+    private static final String MSG_3 = "Yohoooo, I am at your gate.";
+    private static final String MSG_4 = "It is dinner time!";
+    private static final String MSG_5 = "Ok, I am leaving without you.";
+
+    private static final String ID_1 = "0000000001";
+    private static final String ID_2 = "0000000002";
+    private static final String ID_3 = "0000000003";
+    private static final String ID_4 = "0000000004";
+    private static final String ID_5 = "0000000005";
+
+    private Path jsonFile;
+
+    /** Creates the five test messages and gives each its flag (Sent / Stored / Disregard). */
+    @BeforeEach
+    public void populateTestData() throws IOException {
+        Message.resetSentMessages();
+        Message.setCurrentSender("Kyl Smith");
+        jsonFile = Files.createTempFile("stored", ".json");
+        Files.delete(jsonFile);
+
+        flag(new Message(ID_1, 0, "+27834557896", MSG_1), SEND);
+        flag(new Message(ID_2, 1, "+27838884567", MSG_2), STORE);
+        flag(new Message(ID_3, 2, "+27834484567", MSG_3), DISREGARD);
+        flag(new Message(ID_4, 3, "0838884567", MSG_4), SEND);
+        flag(new Message(ID_5, 4, "+27838884567", MSG_5), STORE);
+    }
+
+    private void flag(Message message, int choice) {
+        message.setStorageFile(jsonFile.toString());
+        message.SentMessage(choice);
+    }
+
+    // ---------- Arrays correctly populated ----------
+
+    @Test
+    public void testSentMessagesArrayPopulated() {
+        assertEquals(Arrays.asList("Did you get the cake?", "It is dinner time!"),
+                Message.getSentMessageTexts());
+    }
+
+    @Test
+    public void testDisregardedMessagesArrayPopulated() {
+        assertEquals(Collections.singletonList(MSG_3), Message.getDisregardedMessageTexts());
+    }
+
+    @Test
+    public void testStoredMessagesArrayPopulated() {
+        assertEquals(Arrays.asList(MSG_2, MSG_5), Message.getStoredMessageTexts());
+    }
+
+    @Test
+    public void testMessageIDArrayPopulated() {
+        assertEquals(Arrays.asList(ID_1, ID_2, ID_3, ID_4, ID_5), Message.getMessageIDs());
+    }
+
+    @Test
+    public void testMessageHashArrayPopulated() {
+        assertEquals(Arrays.asList("00:0:DIDCAKE", "00:1:WHERETIME", "00:2:YOHOOOOGATE",
+                "00:3:ITTIME", "00:4:OKYOU"), Message.getMessageHashes());
+    }
+
+    // ---------- Longest message ----------
+
+    @Test
+    public void testLongestStoredMessage() {
+        assertEquals(MSG_2, Message.longestStoredMessage());
+    }
+
+    @Test
+    public void testLongestStoredMessageDetails() {
+        String details = Message.longestStoredMessageDetails();
+        assertTrue(details.contains("Message: " + MSG_2));
+        assertTrue(details.contains("Recipient: +27838884567"));
+        assertTrue(details.contains("Message Hash: 00:1:WHERETIME"));
+    }
+
+    // ---------- Search for a message ID ----------
+
+    @Test
+    public void testSearchForMessageID() {
+        assertEquals("It is dinner time!", Message.searchByMessageID(ID_4));
+    }
+
+    @Test
+    public void testSearchForMessageIDShowsRecipientAndMessage() {
+        assertEquals("Recipient: 0838884567\nMessage: It is dinner time!",
+                Message.searchByMessageIDDetails(ID_4));
+    }
+
+    @Test
+    public void testSearchForMessageIDNotFound() {
+        assertEquals("No message found with ID: 9999999999", Message.searchByMessageID("9999999999"));
+    }
+
+    // ---------- Search for a recipient ----------
+
+    @Test
+    public void testSearchMessagesForRecipient() {
+        assertEquals(Arrays.asList(MSG_2, MSG_5), Message.searchByRecipient("+27838884567"));
+    }
+
+    @Test
+    public void testSearchMessagesForUnknownRecipient() {
+        assertTrue(Message.searchByRecipient("+27000000000").isEmpty());
+    }
+
+    // ---------- Delete using the message hash ----------
+
+    @Test
+    public void testDeleteMessageByHash() throws IOException {
+        String result = Message.deleteMessageByHash("00:1:WHERETIME", jsonFile.toString());
+
+        assertEquals("Message: \"" + MSG_2 + "\" successfully deleted.", result);
+        assertEquals(Collections.singletonList(MSG_5), Message.getStoredMessageTexts());
+        assertFalse(Message.getMessageIDs().contains(ID_2));
+        assertFalse(Message.getMessageHashes().contains("00:1:WHERETIME"));
+
+        String json = new String(Files.readAllBytes(jsonFile), StandardCharsets.UTF_8);
+        assertFalse(json.contains(ID_2));
+        assertTrue(json.contains(ID_5));
+    }
+
+    @Test
+    public void testDeleteMessageByHashNotFound() {
+        assertEquals("No stored message found with hash: 99:9:NONE",
+                Message.deleteMessageByHash("99:9:NONE", jsonFile.toString()));
+        assertEquals(2, Message.getStoredMessageTexts().size());
+    }
+
+    // ---------- Reports ----------
+
+    @Test
+    public void testSentReportShowsHashRecipientAndMessage() {
+        String report = Message.displaySentReport();
+
+        assertTrue(report.contains("Message Hash: 00:0:DIDCAKE"));
+        assertTrue(report.contains("Recipient: +27834557896"));
+        assertTrue(report.contains("Message: " + MSG_1));
+        assertTrue(report.contains("Message Hash: 00:3:ITTIME"));
+        assertFalse(report.contains(MSG_2));
+    }
+
+    @Test
+    public void testStoredReportShowsFullDetails() {
+        String report = Message.displayStoredReport();
+
+        assertTrue(report.contains("Message ID: " + ID_2));
+        assertTrue(report.contains("Message Hash: 00:1:WHERETIME"));
+        assertTrue(report.contains("Sender: Kyl Smith"));
+        assertTrue(report.contains("Recipient: +27838884567"));
+        assertTrue(report.contains("Message: " + MSG_5));
+    }
+
+    @Test
+    public void testSenderAndRecipientOfStoredMessages() {
+        assertEquals("Sender: Kyl Smith | Recipient: +27838884567\n"
+                + "Sender: Kyl Smith | Recipient: +27838884567",
+                Message.displaySenderAndRecipientOfStored());
+    }
+
+    // ---------- Reading the JSON file into the array ----------
+
+    @Test
+    public void testReadJsonFileIntoStoredArray() {
+        Message.resetSentMessages();
+        int loaded = Message.loadStoredMessages(jsonFile.toString());
+
+        assertEquals(2, loaded);
+        assertEquals(Arrays.asList(MSG_2, MSG_5), Message.getStoredMessageTexts());
+        assertEquals(Arrays.asList(ID_2, ID_5), Message.getMessageIDs());
+        assertTrue(Message.displayStoredReport().contains("Sender: Kyl Smith"));
+    }
+
+    @Test
+    public void testReadMissingJsonFile() {
+        Message.resetSentMessages();
+        assertEquals(0, Message.loadStoredMessages(jsonFile + ".missing"));
+        assertTrue(Message.getStoredMessageTexts().isEmpty());
+    }
+}
 }
