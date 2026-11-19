@@ -139,7 +139,7 @@ public class ProgPoe {
      * Lets the user enter exactly numMessages messages using a for loop.
      * The loop counter is used as the message number.
      */
-    private static void enterMessages(Scanner input, int numMessages) {
+    public static void enterMessages(Scanner input, int numMessages) {
         for (int i = 0; i < numMessages; i++) {
             System.out.println("\n--- Message " + (i + 1) + " of " + numMessages + " ---");
 

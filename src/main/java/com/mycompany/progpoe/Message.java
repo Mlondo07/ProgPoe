@@ -30,12 +30,14 @@ public class Message {
     private static int totalSentMessages = 0;
 
     // Part 3 arrays (populated while the program runs - no hard-coding)
-    private static final List<Message> sentMessages = new ArrayList<>();         // Sent Message array
-    private static final List<Message> disregardedMessages = new ArrayList<>();  // Disregarded Messages array
-    private static final List<Message> storedMessages = new ArrayList<>();       // Stored Messages array
-    private static final List<String> messageHashes = new ArrayList<>();         // Message Hash array
-    private static final List<String> messageIDs = new ArrayList<>();            // Message ID array
+    public static final List<Message> sentMessages = new ArrayList<>();         // Sent Message array
+    public static final List<Message> disregardedMessages = new ArrayList<>();  // Disregarded Messages array
+    public static final List<Message> storedMessages = new ArrayList<>();       // Stored Messages array
+     public static final List<String> messageHashes = new ArrayList<>();         // Message Hash array
+     public static final List<String> messageIDs = new ArrayList<>();            // Message ID array
 
+     
+     
     /** The logged-in user, used as the sender of every new message. */
     private static String currentSender = "";
 
@@ -46,6 +48,8 @@ public class Message {
     private String sender;
     private String storageFile = DEFAULT_STORAGE_FILE;
 
+    
+    
     /**
      * Creates a message with a randomly generated ten-digit message ID.
      *
@@ -57,6 +61,11 @@ public class Message {
         this(null, messageNum, recipient, message);
     }
 
+    
+    
+    
+    
+    
     /**
      * Creates a message with a supplied message ID. Used for unit testing,
      * because a random ID can never be asserted against a fixed expected hash.
